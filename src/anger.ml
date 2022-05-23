@@ -5,7 +5,7 @@ let lift_error cmd =
   if status <> 0 then failwith "non-zero exit code" else result
 
 let default_remote = "origin"
-let default_branch = "master"
+let default_branch = "main"
 let git = process "git"
 
 let rev_to_commit_message rev =
