@@ -1,5 +1,4 @@
 open Feather
-open Feather.Infix
 
 let lift_error cmd =
   let result, status = cmd |> collect stdout_and_status in
