@@ -1,0 +1,4 @@
+(executable
+ (name anger)
+ (public_name anger)
+ (libraries feather))
