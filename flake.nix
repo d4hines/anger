@@ -29,6 +29,7 @@
               with ocamlPackages; [
                 ocaml-lsp
                 ocamlformat
+                ocamlformat-rpc
                 odoc
                 ocaml
                 dune_3

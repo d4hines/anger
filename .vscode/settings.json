@@ -1,0 +1,6 @@
+{
+    "ocaml.sandbox": {
+        "kind": "custom",
+        "template": "nix develop /home/d4hines/repos/anger -c $prog $args"
+    }
+}
