@@ -22,7 +22,8 @@
             doCheck = true;
           }).native;
           myDrvs = lib.filterAttrs (_: value: lib.isDerivation value) myPkgs;
-        in {
+        in
+        {
           devShell = (pkgs.mkShell {
             inputsFrom = lib.attrValues myDrvs;
             buildInputs = with pkgs;
@@ -39,10 +40,9 @@
 
           defaultPackage = myPkgs.service;
 
-          defaultApp =
-            flake-utils.lib.mkApp { drv = self.defaultPackage."${system}"; };
-
+          apps.default = { type = "app"; program = "${self.defaultPackage."${system}"}/bin/anger"; };
         };
-    in with flake-utils.lib; eachSystem defaultSystems out;
+    in
+    with flake-utils.lib; eachSystem defaultSystems out;
 
 }

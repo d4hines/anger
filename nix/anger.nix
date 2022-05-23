@@ -37,6 +37,7 @@ rec {
     ];
 
     propagatedBuildInputs = [
+      cmdliner
       feather
     ];
 
