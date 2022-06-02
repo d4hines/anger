@@ -1,11 +1,10 @@
 open Feather
+open Cmdliner
 
 let lift_error cmd =
   let result, status = cmd |> collect stdout_and_status in
   if status <> 0 then failwith "non-zero exit code" else result
 
-let default_remote = "origin"
-let default_branch = "main"
 let git = process "git"
 
 let get_commit_message rev =
@@ -24,7 +23,7 @@ let reset_branch ~branch_name ~rev =
   let _ = git [ "branch"; "-f"; branch_name; rev ] |> lift_error in
   ()
 
-let make_command_string revs =
+let make_command_string remote branch_name revs =
   let commits =
     revs
     |> List.map (fun rev ->
@@ -51,17 +50,17 @@ let make_command_string revs =
      # Example:\n\
      # <commit> <message> -> my_prefix/my_branch\n\n\
      %s"
-    default_remote default_branch commits
+    remote branch_name commits
 
-let () =
+let run remote root_branch =
   let open Feather.Infix in
   let anger_file = ".git/anger" in
   (* Find all commits between HEAD and origin/main *)
-  git [ "rev-list"; Format.sprintf "%s/%s..HEAD" default_remote default_branch ]
+  git [ "rev-list"; Format.sprintf "%s/%s..HEAD" remote root_branch ]
   |> lift_error |> lines
   (* Gather up the notes for each commit *)
   |> List.rev
-  |> make_command_string |> echo > anger_file |> run;
+  |> make_command_string remote root_branch |> echo > anger_file |> run;
   sh "$EDITOR .git/anger" |> run;
   cat anger_file |> lift_error |> lines
   |> List.filter (fun x ->
@@ -85,7 +84,36 @@ let () =
              "push";
              "--force-with-lease";
              "--set-upstream";
-             default_remote;
+             remote;
              branch_name;
            ]
          |> run)
+
+let args =
+  let root_branch =
+    let docv = "root_branch" in
+    let doc = "The git branch to use as the root. Defaults to 'main'." in
+    let open Arg in
+    value & opt string "main" & info [ "b"; "root_branch" ] ~doc ~docv
+  in
+  let remote =
+    let docv = "remote" in
+    let doc = "The git remote to push changes to. Defaults to 'origin'." in
+    let open Arg in
+    value & opt string "origin" & info [ "remote" ] ~doc ~docv
+  in
+  let open Term in
+  const run $ remote $ root_branch
+
+let cmd =
+  let doc = "Propagate git commits to git branches." in
+  let man =
+    [
+      `S Manpage.s_bugs;
+      `P "File issues at https://github.com/d4hines/anger/issues";
+    ]
+  in
+  let info = Cmd.info "anger" ~version:"%‌%VERSION%%" ~doc ~man in
+  Cmd.v info args
+
+let () = exit (Cmd.eval cmd)
