@@ -1,5 +1,8 @@
 > as in "`git reset` used in anger"
 
+> [!IMPORTANT]  
+> This repo is deprecated, and development is happening over at [Yggit](https://github.com/Pilou97/yggit). Use that instead!
+
 ## Concept
 
 You want to use the [stacked diff workflow](https://jg.gg/2018/09/29/stacked-diffs-versus-pull-requests/).
